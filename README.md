@@ -17,14 +17,33 @@ import evo_tft
 ```python
 import evo_tft
 out = evo_tft.predict(
-  obs_reads = df, 
-  read_groups = rg, 
+  obs_reads = obs_reads_df, 
+  read_segments = read_segments, 
   proposed_gts = proposed_gts,
+  out_dir = out_dir,
   hparams = hparams,
 )
 ```
 
-`df` is expected to be a pandas dataframe.
+All function parameters are mandatory except `hparams`.
+
+### Terminology
+A 'position' is a non-negative integer representing a unique amino acid or nucleotide position that has a mutation. Examples include `0`, `1`, etc.
+
+A 'read segment' is a list of positions which can include one or more positions. In the case of the Cry1ac data, the first 100-nt read segment includes two positions with common mutations. Examples include `[0, 1]` and `[2]`.
+
+A 'symbol' is a string representing the genotype of a read segment, and serves as an abstraction to encompass situations with both multiple mutations and single mutations. While any characters are supported, our formatting uses `.` to represent a single wild-type amino acid. Examples include `..`, `V.`, `.I`, and `VI`, which are the symbols in the first 100-nt read segment in the example Cry1ac data. Further examples include `.` and `W` from the second 100-nt read segment.
+
+A 'full-length genotype' is a concatenation of symbols across all read segments. As an example, if there are two read segments where the first segment's symbols are only `.` and `A`, and the second's symbols are only `.` and `B`, then a full-length genotype is one of `['..', 'A.', '.B', 'AB']`. 
+
+### Input data
+`obs_reads` is expected to be a pandas dataframe without an index column. There should be one column named 'Symbol and read segment number' where each value is a string containing a symbol and an integer separated by a space, for example `['.. 0, 'V. 0', '.I 0', 'VI 0', '. 1', 'W 1']`. The remaining columns should be integers beginning with 0 where 1 represents the greatest common factor of all consecutive time intervals. For example, if the experimental timepoints are at hours 0, 12, 24, 48, and 60, the columns should be named 0, 1, 2, 4, 5 where 12 h is the greatest common factor. In the table, each value should be a frequency between 0 and 1, representing the frequency of observing the specified symbol in the specified read segment at the specified timepoint.
+
+`read_segments` is expected to be a list of read segments (see Terminology section). Example: `[[0, 1], [2], [3], [4], [5, 6], [7, 8, 9, 10, 11], [12, 13, 14], [15, 16], [17], [18]]`.
+
+`proposed_gts` is expected to be a list of full-length genotypes (see Terminology section). Example: `['...................', 'VI..........YC.....', 'VIW...NGE.I.YC.KS.L']`.
+
+`out_dir` is expected to be a directory.
 
 `out` is ...
 
@@ -36,9 +55,10 @@ We have included an example directed evolution dataset from Badran et al. 2015 (
 import pandas as pd
 import evo_tft
 
-df = pd.read_csv('/directory/containing/local/repo/clone/example_data/cry1ac_illumina_100nt_obsreads.csv', index_col = 0)
+# Load data
+obs_reads_df = pd.read_csv('/directory/containing/local/repo/clone/example_data/cry1ac_illumina_100nt_obsreads.csv')
 
-out = evo_tft.predict(df)
+out = evo_tft.predict(obs_reads_df)
 ```
 
 ## Contact

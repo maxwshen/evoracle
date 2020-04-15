@@ -1,11 +1,7 @@
 # 
 import sys, string, pickle, subprocess, os, datetime, gzip, time
-sys.path.append('/home/unix/maxwshen/')
 import numpy as np, pandas as pd
-import scipy
 from collections import defaultdict
-from mylib import util
-import _config
 
 import torch, torchvision
 import torch.nn.functional as F
