@@ -45,7 +45,9 @@ A 'full-length genotype' is a concatenation of symbols across all read segments.
 
 `out_dir` is expected to be a directory.
 
-`out` is ...
+`out` is a dict, where:
+- `out['fitness']` is a pandas dataframe with columns 'Full-length genotype' and 'Fitness'
+- `out['genotype_matrix']` is a pandas dataframe with a column 'Full-length genotype' and the same timepoint columns as the input `obs_reads` dataframe. Each value is an inferred frequency from 0 to 1.
 
 ### Running the model with example data
 
