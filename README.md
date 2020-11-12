@@ -1,5 +1,5 @@
-# evo-tft
-Evolutionary trajectory and fitness triangulation
+# Evoracle
+A method for reconstructing long genotypes from short read data with missing linkage between polymorphic alleles from directed evolution timepoints.
 
 ## Dependencies
 The code was written with Python 3.7 with pandas==0.24.2 and numpy==1.16.2. The models were built with pytorch==1.4.0 and torchvision==0.2.2.
