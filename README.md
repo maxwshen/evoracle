@@ -1,31 +1,63 @@
 # Evoracle
-A method for reconstructing long genotypes from short read data with missing linkage between polymorphic alleles from directed evolution timepoints.
+A method for reconstructing frequency trajectories and fitnesses of long genotypes from short read data with missing linkage between polymorphic alleles from directed evolution timepoints.
+
+Input: Time series data of mutation frequencies (provided as a table: time by mutation, where each entry in the table is a frequency). The user is expected to provide this data in a certain format, with guidelines and suggestions below.
+
+Evoracle 1) proposes full-length genotypes that could exist in the population, then 2) infers the frequencies of full-length genotypes at each timepoint, and infers the fitness of each full-length genotype.
+
+Output: A table (time by full-length genotype) of inferred frequencies. A table (full-length genotype by 1) of inferred fitness values.
 
 ## Dependencies
-The code was written with Python 3.7 with pandas==0.24.2 and numpy==1.16.2. The models were built with pytorch==1.4.0 and torchvision==0.2.2.
+The code was developed with Python 3.7 with `pandas==0.24.2` and `numpy==1.16.2`, `pytorch==1.5.0` and `torchvision==0.2.2`.
 
 ## Installation
-Clone this github repository, then in Python, import the `evo_tft.py` script. For instance, you may use the following at the top of your script to import the model.
+Clone this github repository, then in Python, import the `evoracle.py` script. For instance, you may use the following at the top of your script to import the model.
 
 ```python
 import sys
-sys.path.append('/directory/containing/local/repo/clone/')
-import evo_tft
+sys.path.append('/dir/to/local/repo/clone/')
+import evoracle
 ```
 
 ## Usage
 ```python
-import evo_tft
-out = evo_tft.predict(
-  obs_reads = obs_reads_df, 
+import evoracle
+out = evoracle.predict(
+  obs_reads_df = obs_reads_df, 
   read_segments = read_segments, 
   proposed_gts = proposed_gts,
   out_dir = out_dir,
-  hparams = hparams,
+  options = hparams,
 )
 ```
 
-All function parameters are mandatory except `hparams`.
+All parameters are mandatory except `hparams`.
+
+### Running Evoracle with example data
+
+We have included an example directed evolution dataset from Badran et al. 2015 (https://doi.org/10.1038/nature17938), with 34 timepoints collected every 12h or 24 h over a total of 528 h. The PacBio long-read sequencing dataset serves as a "ground truth" against which you can compare the model's inferred reconstructions. The model input are frequencies of 19 common non-synonymous mutations observed in 100-nt segments from 150-nt Illumina sequencing reads. Some 100-nt segments contain multiple mutations.
+
+This code (also provided as `example_run.py`) runs Evoracle on the Badran dataset.
+
+```python
+import pandas as pd
+import evoracle
+import example_dataloader as exdl
+
+# Load data
+obs_reads_df = exdl.load_obs_reads_df('example_data/cry1ac_illumina_100nt_obsreads.csv')
+proposed_gts = exdl.load_proposed_gts('example_data/cry1ac_illumina_100nt_proposedgts.txt')
+read_segments = exdl.load_read_segments('example_data/cry1ac_illumina_100nt_read_groups.pkl')
+
+out_dir = 'example_evoracle_out/'
+
+out = evoracle.predict(
+  obs_reads_df,
+  read_segments,
+  proposed_gts,
+  out_dir,
+)
+```
 
 ### Terminology
 A 'position' is a non-negative integer representing a unique amino acid or nucleotide position that has a mutation. Examples include `0`, `1`, etc.
@@ -48,20 +80,6 @@ A 'full-length genotype' is a concatenation of symbols across all read segments.
 `out` is a dict, where:
 - `out['fitness']` is a pandas dataframe with columns 'Full-length genotype' and 'Fitness'
 - `out['genotype_matrix']` is a pandas dataframe with a column 'Full-length genotype' and the same timepoint columns as the input `obs_reads` dataframe. Each value is an inferred frequency from 0 to 1.
-
-### Running the model with example data
-
-We have included an example directed evolution dataset from Badran et al. 2015 (https://doi.org/10.1038/nature17938), with 34 timepoints collected every 12h or 24 h over a total of 528 h. The PacBio long-read sequencing dataset serves as a "ground truth" against which you can compare the model's inferred reconstructions. The model input will be frequencies of 19 common non-synonymous mutations observed in 100-nt segments from 150-nt Illumina sequencing reads. Some 100-nt segments contain multiple mutations.
-
-```python
-import pandas as pd
-import evo_tft
-
-# Load data
-obs_reads_df = pd.read_csv('/directory/containing/local/repo/clone/example_data/cry1ac_illumina_100nt_obsreads.csv')
-
-out = evo_tft.predict(obs_reads_df)
-```
 
 ## Contact
 maxwshen at gmail.com
