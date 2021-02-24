@@ -1,17 +1,25 @@
-import pandas as pd
-import evoracle
-import example_dataloader as exdl
+'''
+  Example use of Evoracle
+'''
+
+
+# gene = 'abe8e'
+gene = 'cry1ac'
+
+
+# Setup 
+inp_dir = 'example_data/'
+out_dir = f'example_evoracle_out_{gene}/'
 
 # Load data
-obs_reads_df = exdl.load_obs_reads_df('example_data/cry1ac_illumina_100nt_obsreads.csv')
-proposed_gts = exdl.load_proposed_gts('example_data/cry1ac_illumina_100nt_proposedgts.txt')
-read_segments = exdl.load_read_segments('example_data/cry1ac_illumina_100nt_read_groups.txt')
-
-out_dir = 'example_evoracle_out/'
-
-out = evoracle.predict(
-  obs_reads_df,
-  read_segments,
-  proposed_gts,
-  out_dir,
+import pandas as pd
+obs_reads_df = pd.read_csv(
+  inp_dir + f'{gene}_illumina_100nt_obsreads.csv'
 )
+
+# Run Evoracle
+import evoracle
+evoracle.propose_gts_and_infer_fitness_and_frequencies(
+  obs_reads_df = obs_reads_df, 
+  proposed_gt_out_fn = inp_dir + f'{gene}_proposedgts.txt', 
+  inference_out_dir = out_dir)

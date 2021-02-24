@@ -7,8 +7,27 @@ Evoracle 1) proposes full-length genotypes that could exist in the population, t
 
 Output: A table (time by full-length genotype) of inferred frequencies. A table (full-length genotype by 1) of inferred fitness values.
 
+
+## Workflow
+
+A general workflow for using Evoracle with Illumina sequencing is:
+
+Your job:
+1. Perform DNA sequencing at multiple directed evolution timepoints. Convert bcl files to fastq. We recommend >10,000x coverage of your gene (e.g., for a 3000-nt gene with 150-nt reads, at least 200k reads).
+2. Align fastq reads to your reference sequence. We recommend using the bowtie2 aligner.
+3. Decide on a subset of nucleotide positions in your gene to retain for downstream analysis by domain knowledge or exploratory data analysis. While most nucleotides will have rare mutations at some timepoint, we recommend keeping the nucleotide positions that have a mutation with >5% (or >1% or >10%) population frequency at any timepoint. This typically preserves a few dozen nucleotide positions. (Note: Optionally, before this step, translate nucleotides into amino acids and call amino acid mutations.)
+4. Calculate a table of mutation frequencies (called `T` here), where each row is a group of mutations, each column is a timepoint, and each entry is the observed population frequency of reads containing that group of mutations. This is the expected input to Evoracle.
+
+Using the Evoracle code from this package:
+5. Using Evoracle, propose full-length genotypes that may exist in the population using your table `T`. You can manually check and edit these full-length genotypes to incorporate domain knowledge.
+6. Using Evoracle, run inference. Using your table `T`, a list of proposed full-length genotypes, and read groups, Evoracle infers a table of full-length genotype frequencies at each timepoint, and infers a fitness value for each full-length genotype.
+
+A general workflow for using Evoracle with pooled Sanger sequencing is similar. Use Surveyor (https://www.bioke.com/webshop/sg/mutation-surveyor-softgenetics.html) or similar tools to call nucleotide frequencies at each position at each timepoint using a reference sequence. Then proceed with step 3.
+
+
 ## Dependencies
 The code was developed with Python 3.7 with `pandas==0.24.2` and `numpy==1.16.2`, `pytorch==1.5.0` and `torchvision==0.2.2`.
+
 
 ## Installation
 Clone this github repository, then in Python, import the `evoracle.py` script. For instance, you may use the following at the top of your script to import the model.
@@ -47,7 +66,7 @@ import example_dataloader as exdl
 # Load data
 obs_reads_df = exdl.load_obs_reads_df('example_data/cry1ac_illumina_100nt_obsreads.csv')
 proposed_gts = exdl.load_proposed_gts('example_data/cry1ac_illumina_100nt_proposedgts.txt')
-read_segments = exdl.load_read_segments('example_data/cry1ac_illumina_100nt_read_groups.pkl')
+read_segments = exdl.load_read_segments('example_data/cry1ac_illumina_100nt_read_groups.txt')
 
 out_dir = 'example_evoracle_out/'
 
@@ -76,6 +95,8 @@ A 'full-length genotype' is a concatenation of symbols across all read segments.
 `proposed_gts` is expected to be a list of full-length genotypes (see Terminology section). Example: `['...................', 'VI..........YC.....', 'VIW...NGE.I.YC.KS.L']`.
 
 `out_dir` is expected to be a directory.
+
+For advanced use, the `evoracle.predict` function supports a parameter `option` which takes in a string, allowing control over hyperparameters such as training step size, num. iterations, weights on loss function terms. `option` parses string arguments as "(param_name):(value)+(param_name2):value2)+..." without parantheses. We refer the advanced user to read the code in the function `parse_custom_hyperparams` in `evoracle.py` for more details on writing string arguments for `option`.
 
 `out` is a dict, where:
 - `out['fitness']` is a pandas dataframe with columns 'Full-length genotype' and 'Fitness'
