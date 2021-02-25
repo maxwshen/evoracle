@@ -23,7 +23,7 @@ Your job:
 5. Using Evoracle, propose full-length genotypes that may exist in the population using your table `obs_reads_df`. You can manually check and edit these full-length genotypes to incorporate domain knowledge.
 6. Using Evoracle, run inference. Using your table `obs_reads_df`, a list of proposed full-length genotypes, and read groups, Evoracle infers a table of full-length genotype frequencies at each timepoint, and infers a fitness value for each full-length genotype.
 
-A general workflow for using Evoracle with pooled Sanger sequencing is similar. Use Surveyor (https://www.bioke.com/webshop/sg/mutation-surveyor-softgenetics.html) or similar tools to call nucleotide frequencies at each position at each timepoint using a reference sequence. Then proceed with step 3.
+A general workflow for using Evoracle with pooled Sanger sequencing is similar. Use Surveyor (https://www.bioke.com/webshop/sg/mutation-surveyor-softgenetics.html), EditR (https://www.liebertpub.com/doi/full/10.1089/crispr.2018.0014), Tracy (https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-6635-8) or similar tools to call nucleotide frequencies at each position at each timepoint using a reference sequence. Then proceed with step 3.
 
 
 ## Dependencies
