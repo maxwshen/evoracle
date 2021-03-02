@@ -11,9 +11,9 @@ import util
 params = {
   'wt_symbol': '.',
 
-  'change_threshold': 0.025,
+  'change_threshold': 0.01,
   'majority_threshold': 0.5,
-  'split_threshold': 0.05,
+  'split_threshold': 0.01,
 
   'single_muts': [],
   'single_mut_positions': [],
