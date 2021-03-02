@@ -20,6 +20,45 @@ params = {
   'group_to_len': {},
 }
 
+'''
+  Support
+'''
+def parse_custom_hyperparams(custom_hyperparams):
+  '''
+    Parses a '+'-delimited string of hyperparameter tuples '{name}:{value}'
+  '''
+  if custom_hyperparams == '':
+    return
+
+  parse_funcs = {
+    'slash-separated list': lambda arg: [int(s) for s in arg.split('/')],
+    'binary': lambda arg: bool(int(arg)),
+    'int': lambda arg: int(arg),
+    'float': lambda arg: float(arg),
+    'str': lambda arg: str(arg),
+    'bool': lambda arg: bool(arg),
+  }
+
+  term_to_parse = {
+    'wt_symbol': parse_funcs['str'],
+
+    'change_threshold': parse_funcs['float'],
+    'majority_threshold': parse_funcs['float'],
+    'split_threshold': parse_funcs['float'],
+  }
+
+  # Parse hyperparams
+  global params
+  terms = custom_hyperparams.split('+') if '+' in custom_hyperparams else [custom_hyperparams]
+  for term in terms:
+    [kw, args] = term.split(':')
+    if kw in params:
+      parse = term_to_parse[kw]
+      params[kw] = parse(args)
+      print(kw, parse(args))
+
+  return
+
 
 '''
   Build genotypes
@@ -85,7 +124,6 @@ def default_subgroup(group, diffs, split_threshold):
 
 '''
   Parse Symbols and linkage group index
-    TODO - consider renaming column?
     Consider splitting into multiple columns?
 '''
 def setup(ntposs):
@@ -158,10 +196,14 @@ def get_default_genotypes(om_df, groups):
   return sorted(list(gts))
 
 
-def propose_genotypes(obs_marginals, out_fn):
+def propose_genotypes(obs_marginals, out_fn, options = ''):
   '''
     Proposes genotypes.
   '''
+  if options:
+    print(f'Using custom hyperparameters: {options}')
+    parse_custom_hyperparams(options)
+
   setup(obs_marginals['Symbols and linkage group index'])
   groups = util.parse_read_groups(obs_marginals)
 

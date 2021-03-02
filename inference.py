@@ -51,7 +51,9 @@ hparams = {
 # Support
 ##
 def parse_custom_hyperparams(custom_hyperparams):
-  # Defaults
+  '''
+    Parses a '+'-delimited string of hyperparameter tuples '{name}:{value}'
+  '''
   if custom_hyperparams == '':
     return
 
