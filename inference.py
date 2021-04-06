@@ -186,7 +186,7 @@ class MarginalFitnessModel(nn.Module):
       p0 = p0[nonzero_idxs]
       p1 = p1[nonzero_idxs]
 
-      # Ignore case where too many new genotypes by normalizing to 1. This ensures that KL divergence cannot be negative. Deweight loss by 1 / sum
+      # Ignore case where too many new genotypes by normalizing to 1. Deweight loss by 1 / sum
       np1 = p1 / p1.sum()
       weight = p1.sum()
 
