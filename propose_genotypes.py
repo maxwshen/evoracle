@@ -171,7 +171,7 @@ def get_default_genotypes(om_df, groups):
   nt_pos = om_df['Symbols and linkage group index']
   gts = set()
 
-  time_cols = sorted([col for col in om_df if col != 'Symbols and linkage group index'])  
+  time_cols = [col for col in om_df if col != 'Symbols and linkage group index']
   for idx in range(len(time_cols) - 1):
     t0, t1 = time_cols[idx], time_cols[idx + 1]
 
